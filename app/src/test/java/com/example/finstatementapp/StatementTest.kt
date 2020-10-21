@@ -1,5 +1,7 @@
 package com.example.finstatementapp
 
+import com.example.finstatementapp.di.BalanceFactory
+import com.example.finstatementapp.domain.ICalculus
 import com.example.finstatementapp.model.StatementTypeEnum
 import com.example.finstatementapp.ui.StatementViewModel
 import com.nhaarman.mockitokotlin2.mock
@@ -10,7 +12,7 @@ import org.junit.Test
 class StatementTest {
 
     var balance: Double = 0.0
-    private val statementViewModel: StatementViewModel = mock()
+    private val balanceCalculus: ICalculus = BalanceFactory.getBalanceCalculus()
 
     @Before
     fun before() {
@@ -22,7 +24,7 @@ class StatementTest {
         val statementType = StatementTypeEnum.POSITIVE.type
         val userTyped = 221.0
 
-        assertEquals(230221.47, statementViewModel.calculateBalance(statementType, userTyped), 0.01)
+        assertEquals(23221.47, balanceCalculus.calculate(statementType, userTyped, 23000.47), 0.01)
     }
 
     @Test
@@ -30,15 +32,19 @@ class StatementTest {
         val statementType = StatementTypeEnum.NEGATIVE.type
         val userTyped = 459.53
 
-        assertEquals(22540.94, statementViewModel.calculateBalance(statementType, userTyped), 0.01)
+        assertEquals(22540.94, balanceCalculus.calculate(statementType, userTyped, 23000.47), 0.01)
     }
 
     @Test
-    fun `Check if an incorrect input is handled`() {
-        val statementType = StatementTypeEnum.POSITIVE.type
+    fun `Check if a negative input is handled`() {
+        var statementType = StatementTypeEnum.POSITIVE.type
         val userTyped = -112.0
 
-        assertEquals(23000.47, statementViewModel.calculateBalance(statementType, userTyped), 0.01)
+        assertEquals(23112.47, balanceCalculus.calculate(statementType, userTyped, 23000.47), 0.01)
+
+        statementType = StatementTypeEnum.NEGATIVE.type
+
+        assertEquals(22888.47, balanceCalculus.calculate(statementType, userTyped, 23000.47), 0.01)
     }
 
 }
